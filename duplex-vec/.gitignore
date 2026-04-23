@@ -1,0 +1,16 @@
+data/
+dist/
+build/
+biovec.egg-info
+*__pycache__
+*pyc
+.vscode
+Artifacts/
+.ipynb_checkpoints/
+
+venv/
+bvec/
+env/
+
+Miniconda3-latest-MacOSX-arm64.sh
+Miniforge3-MacOSX-arm64.sh

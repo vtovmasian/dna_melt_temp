@@ -1,0 +1,1 @@
+from biovec.models.prot_vec import *
