@@ -7,8 +7,11 @@ Biological Sequences](http://arxiv.org/pdf/1503.05140v1.pdf)"
 
 ### Installation
 ```
-pip install biovec
+pip install biovec biopython
 ```
+
+If you are using Python 3.14, prefer `pip` for BioPython installation in your active environment.
+Some conda channels still lag behind on 3.14 builds, which can cause solver failures like the one you saw.
 
 ### Quick Start
 

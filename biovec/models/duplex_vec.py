@@ -1,3 +1,5 @@
+from typing import Optional, TextIO
+
 from gensim.models import Word2Vec
 from gensim.models.word2vec import Text8Corpus 
 import pandas as pd
@@ -88,28 +90,34 @@ class DuplexVec(Word2Vec):
 
     return np.mean(vecs, axis=0) if vecs else np.zeros(self.vector_size) # Note: Try sum vs mean
     
-  def batch_encode(self, df: pd.DataFrame, verbose: bool = False, error_log_path: str = None) -> np.ndarray:
+  def batch_encode(self, df: pd.DataFrame, verbose: bool = False, error_log_path: Optional[str] = None) -> np.ndarray:
     if verbose and not error_log_path:
       raise ValueError("Batch Encode: Error logging path not specified.")
     
+    log: Optional[TextIO] = None
     if verbose:
+      assert error_log_path is not None
       log = open(error_log_path, 'w')
-      log.write("Failed to encode...\nIdx Top Bottom Error\n")
+      assert log is not None
+      log_file = log
+      log_file.write("Failed to encode...\nIdx Top Bottom Error\n")
     
     vectors = []
-    for row in tqdm(df.itertuples(index=False), total=len(df), desc="Corpus generation progress"):
-      i = row.index
-      top = row.Top.strip().upper()
-      bottom = row.Bottom.strip().upper()
+    for i, row in tqdm(enumerate(df.itertuples(index=False)), total=len(df), desc="Corpus generation progress"):
+      top = str(row.Top).strip().upper()
+      bottom = str(row.Bottom).strip().upper()
 
       if not is_valid_dna(top) or not is_valid_dna(bottom):
         if verbose:
+          assert log is not None
           log.write(f"{i} {top} {bottom} Invalid characters\n")
         continue
 
       if len(top) != len(bottom):
          if verbose:
+            assert log is not None
             log.write(f"{i} {top} {bottom} Length mismatch\n")
+         continue
 
       try: 
         vec = self.encode(top, bottom)
@@ -117,12 +125,13 @@ class DuplexVec(Word2Vec):
 
       except Exception as e:
         if verbose:
+          assert log is not None
           log.write(f"{i}\t{top}\t{bottom}\t{e}\n")
         continue
     
     if verbose:
+      assert log is not None
       log.close()
 
     return np.vstack(vectors) if vectors else np.empty((0, self.vector_size))
   
-

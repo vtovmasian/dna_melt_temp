@@ -28,7 +28,7 @@ class ProtVec(word2vec.Word2Vec):
             print('Generate Corpus file from fasta file...')
             generate_corpusfile(fasta_fname, n, corpus_fname)
             corpus = word2vec.Text8Corpus(corpus_fname)
-        word2vec.Word2Vec.__init__(self, corpus, vector_size=size, sg=sg, window=window, min_count=min_count, workers=workers)
+        super().__init__(corpus, vector_size=size, sg=sg, window=window, min_count=min_count, workers=workers)
 
     def to_vecs(self, seq):
         """
@@ -42,7 +42,7 @@ class ProtVec(word2vec.Word2Vec):
             ngram_vecs = []
             for ngram in ngram_patterns[num]:
                 try:
-                    ngram_vecs.append(self[ngram])
+                    ngram_vecs.append(self[ngram]) # type: ignore
                 except:
                     raise Exception("Model has never trained this n-gram: " + ngram)
             protvecs[num,] = sum(ngram_vecs)
@@ -65,6 +65,7 @@ class ProtVec(word2vec.Word2Vec):
         for line in sequencefile:
             line = line.strip()
             if len(line) > 0 : 
+                accession = ''
                 if line[0] == '>':
                     accession = str(line[1:]).replace(" ","_")
                     if accession not in seqDict:
@@ -97,7 +98,7 @@ class ProtVec(word2vec.Word2Vec):
 
         outputlogfile = open(outputfilename + '_failed.tsv', 'w')
         outputlogfile.write('failed accession' + '\t' + 'sequence' + '\n')
-
+        accessionarray = np.empty([3,self.size])
         for number in range(len(accessionlist)):
             try:
                 if seqDict[accessionlist[number]][-1] == '*':

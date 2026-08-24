@@ -14,3 +14,6 @@ bvec/
 env/
 Miniconda3-latest-MacOSX-arm64.sh
 Miniforge3-MacOSX-arm64.sh
+trained_models/
+Artifacts/
+fasta_corpora/
